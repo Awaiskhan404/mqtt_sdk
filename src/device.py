@@ -1,6 +1,7 @@
 from typing import List, Dict, Any
 from interfaces import Interfaces
 from dotenv import dotenv_values
+from machine_sub_handler import machine_handler
 import paho.mqtt.client as mqtt
 import logging
 import threading
@@ -68,7 +69,7 @@ class Device:
         - userdata: Any, user-defined data.
         - msg: mqtt.MQTTMessage, the received message.
         """
-        print("trigger received-> " + msg.topic + " " + str(msg.payload))
+        machine_handler(client, userdata, msg)
 
     def publish(self, topic: str, payload: Any) -> None:
         """
@@ -94,5 +95,3 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
 
     device = Device()
-
-    device.publish("mqtt.heisenberg.live.MachineEvent", "hello")
