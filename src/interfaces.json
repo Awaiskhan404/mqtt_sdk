@@ -1,0 +1,1 @@
+[{"interface_name": "mqtt.heisenberg.live.MachineEvent", "version_minor": 1, "type": "property", "ownership": "device", "mappings": {"endpoint": "/command", "type": "number"}}]
