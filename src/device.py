@@ -5,6 +5,7 @@ from machine_sub_handler import machine_handler
 import paho.mqtt.client as mqtt
 import logging
 import threading
+import uuid
 
 
 class Device:
@@ -18,7 +19,7 @@ class Device:
         """
         self.interfaces = Interfaces(protocol='mqtt')
         self.__device_interfaces: List[Dict[str, Any]] = self.get_device_interfaces()
-        self.__device_id: Any = NotImplemented
+        self.__device_id: Any = self._device_id()
         self.__device_mac: Any = NotImplemented
 
         self.mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
@@ -57,7 +58,8 @@ class Device:
         logger.debug(f"Connected with result code {reason_code}")
         # create an array tuple of device interfaces and qos using lambda
         _ = list(
-            map(lambda interface: (interface['interface_name'], 1), self.interfaces.get_interfaces()))
+            map(lambda interface: (interface['interface_name'].replace('<device_id>', self.__device_id), 1),
+                self.interfaces.get_interfaces()))
         client.subscribe(_)  # subscribe to the interfaces
 
     def on_message(self, client: mqtt.Client, userdata: Any, msg: mqtt.MQTTMessage) -> None:
@@ -86,6 +88,15 @@ class Device:
         logger.debug(f"Publishing message to topic {topic}")
 
         self.mqttc.publish(topic, payload=payload)
+
+    def _device_id(self) -> Any:
+        """
+        Gets the device ID.
+
+        Returns:
+        - Any, the device ID.
+        """
+        return hex(uuid.getnode()).strip('0x')
 
 
 if __name__ == '__main__':
